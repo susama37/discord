@@ -1,0 +1,3151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="google-site-verification" content="ZmxFO1BgMIyEDCDvbB36c3cL_Eb6BXQ6F_WjP3KFtMk" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Discord Services | Professional Discord Server Setup</title>
+<meta name="description" content="Professional Discord server setup, reworks, bots, automation and custom systems.">
+<meta name="theme-color" content="#07090f">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --bg:#07090f;
+  --panel:#0d111b;
+  --panel2:#111725;
+  --text:#f5f7fb;
+  --muted:#9ba5b7;
+  --line:#20283a;
+  --accent:#7c5cff;
+  --accent2:#25d9ff;
+  --good:#36e08b;
+  --shadow:0 18px 55px rgba(0,0,0,.38);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 15% 0%,rgba(124,92,255,.12),transparent 30%),
+    radial-gradient(circle at 90% 15%,rgba(37,217,255,.08),transparent 25%),
+    var(--bg);
+  overflow-x:hidden;
+}
+
+/* Lightweight background grid */
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-2;
+  opacity:.45;
+  background-image:
+    linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:55px 55px;
+  mask-image:linear-gradient(to bottom,#000 0%,transparent 80%);
+}
+
+/* Small ambient glow */
+body:after{
+  content:"";
+  position:fixed;
+  width:380px;
+  height:380px;
+  top:-180px;
+  left:-180px;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:-1;
+  background:rgba(124,92,255,.10);
+  filter:blur(55px);
+  animation:ambient 18s ease-in-out infinite alternate;
+}
+
+@keyframes ambient{
+  0%{
+    transform:translate(0,0);
+  }
+  100%{
+    transform:translate(75vw,35vh);
+  }
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+button,
+input,
+textarea,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.container{
+  width:min(1180px,92%);
+  margin:auto;
+}
+
+/* NAV */
+
+.nav{
+  height:76px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:20;
+  overflow:hidden;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  background:rgba(7,9,15,.82);
+  backdrop-filter:blur(14px);
+}
+
+.nav:after{
+  content:"";
+  position:absolute;
+  bottom:0;
+  left:-25%;
+  width:25%;
+  height:1px;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    var(--accent),
+    var(--accent2),
+    transparent
+  );
+  box-shadow:0 0 12px rgba(124,92,255,.5);
+  animation:navLine 7s linear infinite;
+}
+
+@keyframes navLine{
+  from{left:-25%}
+  to{left:125%}
+}
+
+.brand{
+  font-size:19px;
+  font-weight:900;
+  letter-spacing:.5px;
+}
+
+.brand span{
+  color:var(--accent2);
+}
+
+.navlinks{
+  display:flex;
+  gap:24px;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.navlinks a{
+  transition:color .2s ease;
+}
+
+.navlinks a:hover{
+  color:#fff;
+}
+
+/* BUTTONS */
+
+.admin-btn,
+.primary,
+.secondary{
+  border-radius:12px;
+  padding:11px 16px;
+  color:#fff;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.04);
+  transition:
+    transform .2s ease,
+    background .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease;
+}
+
+.admin-btn:hover,
+.secondary:hover{
+  transform:translateY(-2px);
+  background:rgba(255,255,255,.08);
+  border-color:rgba(255,255,255,.16);
+}
+
+.primary{
+  position:relative;
+  overflow:hidden;
+  border:0;
+  font-weight:800;
+  background:linear-gradient(135deg,#7c5cff,#4e8cff);
+  box-shadow:0 10px 30px rgba(92,76,255,.20);
+}
+
+.primary:after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-100%;
+  width:60%;
+  height:100%;
+  background:linear-gradient(
+    100deg,
+    transparent,
+    rgba(255,255,255,.28),
+    transparent
+  );
+  transform:skewX(-20deg);
+  animation:buttonShine 6s ease-in-out infinite;
+}
+
+@keyframes buttonShine{
+  0%,65%{left:-100%}
+  85%,100%{left:150%}
+}
+
+.primary:hover{
+  transform:translateY(-2px);
+  box-shadow:
+    0 12px 35px rgba(92,76,255,.30),
+    0 0 25px rgba(124,92,255,.12);
+}
+
+/* HERO */
+
+.hero{
+  position:relative;
+  overflow:hidden;
+  padding:115px 0 90px;
+  text-align:center;
+}
+
+.heroGlow{
+  position:absolute;
+  width:520px;
+  height:260px;
+  left:50%;
+  top:35%;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:rgba(124,92,255,.08);
+  filter:blur(60px);
+  pointer-events:none;
+  animation:heroGlow 8s ease-in-out infinite alternate;
+}
+
+@keyframes heroGlow{
+  from{
+    opacity:.45;
+    transform:translate(-50%,-50%) scale(.95);
+  }
+  to{
+    opacity:.8;
+    transform:translate(-50%,-50%) scale(1.05);
+  }
+}
+
+.badge{
+  position:relative;
+  display:inline-flex;
+  padding:8px 13px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:999px;
+  background:rgba(255,255,255,.035);
+  color:#cbd2df;
+  font-size:13px;
+}
+
+.hero h1{
+  position:relative;
+  margin:24px 0 20px;
+  font-size:clamp(42px,7vw,82px);
+  line-height:.96;
+  letter-spacing:-4px;
+  animation:heroIn .7s ease-out both;
+}
+
+@keyframes heroIn{
+  from{
+    opacity:0;
+    transform:translateY(18px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.gradient{
+  background:
+    linear-gradient(
+      100deg,
+      #fff,
+      var(--accent2),
+      #a98cff,
+      #fff
+    );
+  background-size:220% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  animation:gradientMove 7s linear infinite;
+}
+
+@keyframes gradientMove{
+  to{
+    background-position:220% center;
+  }
+}
+
+.hero p{
+  position:relative;
+  max-width:700px;
+  margin:auto;
+  color:var(--muted);
+  font-size:17px;
+  line-height:1.7;
+}
+
+.actions{
+  position:relative;
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:30px;
+}
+
+.status{
+  position:relative;
+  margin:22px auto 0;
+  color:#9fe9bf;
+  font-size:13px;
+}
+
+.status:first-letter{
+  text-shadow:0 0 10px rgba(54,224,139,.7);
+}
+
+/* SECTIONS */
+
+.section{
+  padding:75px 0;
+}
+
+.section-head{
+  text-align:center;
+  margin-bottom:35px;
+}
+
+.eyebrow{
+  color:var(--accent2);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  font-weight:800;
+}
+
+.section h2{
+  margin:10px 0;
+  font-size:38px;
+}
+
+.section-head p{
+  color:var(--muted);
+}
+
+/* LIGHTWEIGHT REVEAL */
+
+.section{
+  animation:sectionIn .7s ease-out both;
+}
+
+@keyframes sectionIn{
+  from{
+    opacity:0;
+    transform:translateY(18px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* CARDS */
+
+.grid3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+
+.card{
+  position:relative;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:25px;
+  background:linear-gradient(
+    180deg,
+    rgba(255,255,255,.035),
+    rgba(255,255,255,.012)
+  );
+  box-shadow:var(--shadow);
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    box-shadow .25s ease;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+  border-color:rgba(124,92,255,.35);
+  box-shadow:
+    0 22px 55px rgba(0,0,0,.38),
+    0 0 22px rgba(124,92,255,.06);
+}
+
+/* subtle light sweep */
+.card:before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-120%;
+  width:70%;
+  height:100%;
+  pointer-events:none;
+  background:linear-gradient(
+    100deg,
+    transparent,
+    rgba(255,255,255,.035),
+    transparent
+  );
+  transform:skewX(-18deg);
+  transition:left .7s ease;
+}
+
+.card:hover:before{
+  left:140%;
+}
+
+/* PACKAGES */
+
+.package{
+  min-height:290px;
+}
+
+.package h3{
+  margin:8px 0;
+  font-size:25px;
+}
+
+.price{
+  margin:15px 0;
+  font-size:31px;
+  font-weight:900;
+}
+
+.feature{
+  display:flex;
+  gap:9px;
+  margin:11px 0;
+  color:#d6dbe5;
+  font-size:14px;
+}
+
+.feature b{
+  color:var(--good);
+}
+
+.muted{
+  color:var(--muted);
+}
+
+/* POPULAR ADVANCED PACKAGE */
+
+.package.popular{
+  border-color:rgba(124,92,255,.48);
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(124,92,255,.12),
+      transparent 48%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.055),
+      rgba(255,255,255,.012)
+    );
+  box-shadow:
+    0 20px 65px rgba(0,0,0,.42),
+    0 0 38px rgba(124,92,255,.10);
+  transform:translateY(-4px);
+}
+
+.package.popular:hover{
+  transform:translateY(-9px);
+  border-color:rgba(124,92,255,.65);
+  box-shadow:
+    0 25px 70px rgba(0,0,0,.45),
+    0 0 55px rgba(124,92,255,.16);
+}
+
+/* soft glow inside popular card */
+
+.package.popular:after{
+  content:"";
+  position:absolute;
+  width:190px;
+  height:190px;
+  right:-90px;
+  top:-90px;
+  border-radius:50%;
+  background:rgba(124,92,255,.14);
+  filter:blur(45px);
+  pointer-events:none;
+  animation:popularGlow 5s ease-in-out infinite alternate;
+}
+
+@keyframes popularGlow{
+  from{
+    opacity:.45;
+    transform:scale(.9);
+  }
+  to{
+    opacity:.8;
+    transform:scale(1.08);
+  }
+}
+
+/* popular badge */
+
+.popularBadge{
+  position:absolute;
+  top:14px;
+  right:14px;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(124,92,255,.45);
+  background:rgba(124,92,255,.12);
+  color:#d9d2ff;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:1.1px;
+  text-transform:uppercase;
+  box-shadow:0 0 18px rgba(124,92,255,.10);
+  animation:badgeFloat 3.5s ease-in-out infinite;
+}
+
+.popularBadge .dot{
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:#a98cff;
+  box-shadow:0 0 9px #a98cff;
+}
+
+@keyframes badgeFloat{
+  0%,100%{
+    transform:translateY(0);
+  }
+  50%{
+    transform:translateY(-2px);
+  }
+}
+
+/* PRO label */
+
+.proLabel{
+  display:inline-flex;
+  align-items:center;
+  margin-top:8px;
+  padding:4px 8px;
+  border-radius:6px;
+  border:1px solid rgba(37,217,255,.20);
+  background:rgba(37,217,255,.06);
+  color:#8eeaff;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:1.5px;
+  overflow:hidden;
+}
+
+/* STATS */
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+
+.stat{
+  text-align:center;
+  padding:24px;
+}
+
+.stat strong{
+  display:block;
+  font-size:30px;
+  background:
+    linear-gradient(
+      90deg,
+      #fff,
+      #25d9ff,
+      #a98cff,
+      #fff
+    );
+  background-size:220% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  animation:statMove 8s linear infinite;
+}
+
+@keyframes statMove{
+  to{
+    background-position:220% center;
+  }
+}
+
+.stat:hover{
+  transform:translateY(-5px);
+  border-color:rgba(37,217,255,.28);
+}
+
+/* PROCESS */
+
+.steps{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+}
+
+.stepnum{
+  color:var(--accent2);
+  font-size:13px;
+  font-weight:900;
+}
+
+/* FAQ */
+
+.faq{
+  padding:18px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.faq summary{
+  cursor:pointer;
+  font-weight:700;
+}
+
+.faq p{
+  color:var(--muted);
+  line-height:1.7;
+}
+
+/* CTA */
+
+.cta{
+  position:relative;
+  overflow:hidden;
+  padding:45px;
+  text-align:center;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:25px;
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(124,92,255,.10),
+      transparent 55%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(124,92,255,.07),
+      rgba(37,217,255,.025)
+    );
+}
+
+.cta:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:inherit;
+  box-shadow:inset 0 0 40px rgba(124,92,255,.035);
+}
+
+/* FOOTER */
+
+footer{
+  padding:35px 0;
+  color:var(--muted);
+  border-top:1px solid rgba(255,255,255,.06);
+  font-size:13px;
+}
+
+.footerrow{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  flex-wrap:wrap;
+}
+
+/* MODALS */
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(10px);
+}
+
+.modal.open{
+  display:flex;
+  animation:modalFade .2s ease;
+}
+
+@keyframes modalFade{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+.modalbox{
+  width:min(760px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:#0b1019;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:22px;
+  box-shadow:0 30px 100px rgba(0,0,0,.7);
+  animation:modalIn .25s ease-out;
+}
+
+@keyframes modalIn{
+  from{
+    opacity:0;
+    transform:translateY(15px) scale(.98);
+  }
+  to{
+    opacity:1;
+    transform:none;
+  }
+}
+
+.modalhead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  padding:22px;
+  border-bottom:1px solid var(--line);
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:rgba(11,16,25,.94);
+  backdrop-filter:blur(10px);
+}
+
+.close{
+  width:38px;
+  height:38px;
+  border:0;
+  border-radius:10px;
+  background:rgba(255,255,255,.05);
+  color:white;
+  font-size:20px;
+}
+
+.close:hover{
+  background:rgba(255,255,255,.10);
+}
+
+.modalbody{
+  padding:22px;
+}
+
+.detailgrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+
+.list{
+  padding-left:18px;
+  color:#cbd2df;
+  line-height:1.9;
+}
+
+/* FORMS */
+
+.form{
+  display:grid;
+  gap:12px;
+}
+
+.form label{
+  color:#9ba5b7;
+  font-size:12px;
+}
+
+.form input,
+.form textarea,
+.form select{
+  width:100%;
+  padding:11px 12px;
+  outline:none;
+  border:1px solid #263044;
+  border-radius:11px;
+  background:#070b12;
+  color:white;
+  transition:border-color .2s,box-shadow .2s;
+}
+
+.form input:focus,
+.form textarea:focus,
+.form select:focus{
+  border-color:rgba(124,92,255,.6);
+  box-shadow:0 0 18px rgba(124,92,255,.07);
+}
+
+.form textarea{
+  min-height:95px;
+  resize:vertical;
+}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.error{
+  display:none;
+  padding:10px;
+  border-radius:10px;
+  background:rgba(255,77,77,.08);
+  border:1px solid rgba(255,77,77,.32);
+  color:#ff9d9d;
+  font-size:13px;
+}
+
+.toast{
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  z-index:200;
+  display:none;
+  padding:13px 16px;
+  border-radius:12px;
+  background:#111927;
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:var(--shadow);
+}
+
+/* ADMIN */
+
+.admin-tabs{
+  display:flex;
+  gap:8px;
+  overflow:auto;
+  margin-bottom:18px;
+}
+
+.admin-tab{
+  white-space:nowrap;
+  padding:9px 12px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;
+  background:rgba(255,255,255,.025);
+  color:#aab3c3;
+}
+
+.admin-tab:hover{
+  color:white;
+  background:rgba(255,255,255,.06);
+}
+
+.admin-tab.active{
+  color:white;
+  background:rgba(124,92,255,.13);
+  border-color:rgba(124,92,255,.4);
+}
+
+.admin-section{
+  display:none;
+}
+
+.admin-section.active{
+  display:block;
+}
+
+.editor-card{
+  margin-bottom:15px;
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:rgba(255,255,255,.015);
+}
+
+.editor-card h4{
+  margin:0 0 14px;
+}
+
+.small{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.admin-list{
+  display:grid;
+  gap:10px;
+}
+
+.admin-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:rgba(255,255,255,.015);
+}
+
+.role{
+  padding:4px 8px;
+  border-radius:999px;
+  background:rgba(124,92,255,.12);
+  color:#cfc6ff;
+  font-size:11px;
+}
+
+.danger{
+  padding:8px 11px;
+  border-radius:9px;
+  background:rgba(255,77,77,.07);
+  border:1px solid rgba(255,77,77,.25);
+  color:#ff9c9c;
+}
+
+.preview{
+  margin-top:10px;
+  padding:13px;
+  border:1px dashed rgba(255,255,255,.12);
+  border-radius:13px;
+  color:#cbd2df;
+}
+
+/* PARTICLES - only 12 lightweight particles */
+
+.particle{
+  position:fixed;
+  width:2px;
+  height:2px;
+  border-radius:50%;
+  background:#fff;
+  opacity:.2;
+  pointer-events:none;
+  z-index:-1;
+  animation:particleFloat linear infinite;
+}
+
+@keyframes particleFloat{
+  from{
+    transform:translateY(105vh);
+    opacity:0;
+  }
+  12%{
+    opacity:.22;
+  }
+  88%{
+    opacity:.22;
+  }
+  to{
+    transform:translateY(-10vh);
+    opacity:0;
+  }
+}
+
+/* MOBILE */
+
+@media(max-width:800px){
+
+  .grid3,
+  .stats,
+  .steps{
+    grid-template-columns:1fr;
+  }
+
+  .navlinks{
+    display:none;
+  }
+
+  .hero{
+    padding:80px 0 55px;
+  }
+
+  .hero h1{
+    letter-spacing:-2px;
+  }
+
+  .detailgrid,
+  .row{
+    grid-template-columns:1fr;
+  }
+
+  .package.popular{
+    transform:none;
+  }
+
+  .package.popular:hover{
+    transform:translateY(-5px);
+  }
+
+  .cta{
+    padding:30px 20px;
+  }
+
+  .section h2{
+    font-size:31px;
+  }
+}
+
+/* REDUCE MOTION */
+
+@media(prefers-reduced-motion:reduce){
+
+  *,
+  *:before,
+  *:after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    scroll-behavior:auto !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<nav class="nav">
+<div class="container" style="display:flex;align-items:center;justify-content:space-between;width:100%">
+
+<div class="brand">
+DISCORD <span>SERVICES</span>
+</div>
+
+<div class="navlinks">
+<a href="#services">Services</a>
+<a href="#packages">Packages</a>
+<a href="#process">Process</a>
+<a href="#faq">FAQ</a>
+</div>
+
+<button class="admin-btn" onclick="openLogin()">
+Admin
+</button>
+
+</div>
+</nav>
+
+
+<header class="hero">
+
+<div class="heroGlow"></div>
+
+<div class="container">
+
+<div class="badge">
+Professional Discord Setup • Reworks • Custom Systems
+</div>
+
+<h1>
+Build a Discord server<br>
+<span class="gradient">that actually works.</span>
+</h1>
+
+<p id="announcement">
+Professional Discord server setup, reworks and custom systems.
+</p>
+
+<div class="actions">
+
+<a class="primary" href="#packages">
+View Packages
+</a>
+
+<button class="secondary" onclick="openOrder()">
+Place an Order
+</button>
+
+</div>
+
+<div class="status">
+● <span id="serviceStatus">OPEN</span>
+</div>
+
+</div>
+</header>
+
+
+<section class="section" id="services">
+
+<div class="container">
+
+<div class="section-head">
+
+<div class="eyebrow">
+What we do
+</div>
+
+<h2>
+Discord systems, built properly.
+</h2>
+
+<p>
+From a clean server setup to a complete custom rework.
+</p>
+
+</div>
+
+
+<div class="grid3">
+
+<div class="card">
+<h3>Server Design</h3>
+<p class="muted">
+Categories, channels, roles, permissions and professional structure.
+</p>
+</div>
+
+<div class="card">
+<h3>Automation</h3>
+<p class="muted">
+Tickets, moderation, applications, webhooks and utility systems.
+</p>
+</div>
+
+<div class="card">
+<h3>Custom Systems</h3>
+<p class="muted">
+Custom workflows and special requirements for your community.
+</p>
+</div>
+
+</div>
+
+</div>
+</section>
+
+
+<section class="section" id="packages">
+
+<div class="container">
+
+<div class="section-head">
+
+<div class="eyebrow">
+Packages
+</div>
+
+<h2>
+Choose your level.
+</h2>
+
+<p>
+Click a package to see the full details.
+</p>
+
+</div>
+
+<div class="grid3" id="packageGrid"></div>
+
+</div>
+</section>
+
+
+<section class="section">
+
+<div class="container">
+
+<div class="stats">
+
+<div class="card stat">
+<strong id="projects">0+</strong>
+<span class="muted">Projects</span>
+</div>
+
+<div class="card stat">
+<strong id="clients">0+</strong>
+<span class="muted">Clients</span>
+</div>
+
+<div class="card stat">
+<strong id="systems">0+</strong>
+<span class="muted">Systems</span>
+</div>
+
+<div class="card stat">
+<strong id="rating">—</strong>
+<span class="muted">Rating</span>
+</div>
+
+</div>
+
+</div>
+</section>
+
+
+<section class="section" id="process">
+
+<div class="container">
+
+<div class="section-head">
+
+<div class="eyebrow">
+How it works
+</div>
+
+<h2>
+Simple process.
+</h2>
+
+</div>
+
+<div class="steps">
+
+<div class="card">
+<div class="stepnum">01</div>
+<h3>Discuss</h3>
+<p class="muted">
+Tell us what your server needs.
+</p>
+</div>
+
+<div class="card">
+<div class="stepnum">02</div>
+<h3>Plan</h3>
+<p class="muted">
+We agree on the package and requirements.
+</p>
+</div>
+
+<div class="card">
+<div class="stepnum">03</div>
+<h3>Build</h3>
+<p class="muted">
+The server is configured and tested.
+</p>
+</div>
+
+<div class="card">
+<div class="stepnum">04</div>
+<h3>Handover</h3>
+<p class="muted">
+You receive the completed setup.
+</p>
+</div>
+
+</div>
+
+</div>
+</section>
+
+
+<section class="section" id="faq">
+
+<div class="container">
+
+<div class="section-head">
+
+<div class="eyebrow">
+FAQ
+</div>
+
+<h2>
+Questions.
+</h2>
+
+</div>
+
+<details class="faq">
+<summary>How do payments work?</summary>
+<p>
+Prices are based on Blox Fruits Values. Exact fruits are negotiable as long as the agreed value is met.
+</p>
+</details>
+
+<details class="faq">
+<summary>How do I order?</summary>
+<p>
+Join the service Discord and create a ticket. The requirements and final price can be discussed there.
+</p>
+</details>
+
+<details class="faq">
+<summary>Can I request custom features?</summary>
+<p>
+Yes. Custom requirements can be discussed before the order is accepted.
+</p>
+</details>
+
+</div>
+</section>
+
+
+<section class="section">
+
+<div class="container">
+
+<div class="cta">
+
+<div class="eyebrow">
+Ready?
+</div>
+
+<h2>
+Start your server rework.
+</h2>
+
+<p class="muted">
+Join the Discord and open a ticket.
+</p>
+
+<button class="primary" onclick="openOrder()">
+Place an Order
+</button>
+
+</div>
+
+</div>
+</section>
+
+
+<footer>
+
+<div class="container footerrow">
+
+<span>
+© <span id="year"></span> Discord Services
+</span>
+
+<span>
+Prices are based on Blox Fruits Values.
+</span>
+
+</div>
+
+</footer>
+
+
+<!-- PACKAGE MODAL -->
+
+<div
+class="modal"
+id="packageModal"
+onclick="outsideClose(event,'packageModal')"
+>
+
+<div class="modalbox">
+
+<div class="modalhead">
+
+<div>
+
+<div class="eyebrow" id="detailEyebrow"></div>
+
+<h2 id="detailTitle" style="margin:5px 0"></h2>
+
+</div>
+
+<button
+class="close"
+onclick="closeModal('packageModal')"
+>
+×
+</button>
+
+</div>
+
+<div
+class="modalbody"
+id="detailBody"
+></div>
+
+</div>
+</div>
+
+
+<!-- ORDER MODAL -->
+
+<div
+class="modal"
+id="orderModal"
+onclick="outsideClose(event,'orderModal')"
+>
+
+<div class="modalbox">
+
+<div class="modalhead">
+
+<h2>
+Place an Order
+</h2>
+
+<button
+class="close"
+onclick="closeModal('orderModal')"
+>
+×
+</button>
+
+</div>
+
+<div class="modalbody">
+
+<p class="muted">
+Join the service Discord and create a ticket.
+Tell the staff which package you want and your requirements.
+</p>
+
+<a
+id="orderLink"
+class="primary"
+style="display:inline-block;margin-top:10px"
+target="_blank"
+rel="noopener"
+>
+Join Service Discord
+</a>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- LOGIN MODAL -->
+
+<div
+class="modal"
+id="loginModal"
+onclick="outsideClose(event,'loginModal')"
+>
+
+<div
+class="modalbox"
+style="max-width:440px"
+>
+
+<div class="modalhead">
+
+<h2>
+Admin Login
+</h2>
+
+<button
+class="close"
+onclick="closeModal('loginModal')"
+>
+×
+</button>
+
+</div>
+
+<div class="modalbody">
+
+<div class="form">
+
+<label>Email</label>
+
+<input
+id="loginEmail"
+type="email"
+autocomplete="username"
+>
+
+<label>Password</label>
+
+<input
+id="loginPassword"
+type="password"
+autocomplete="current-password"
+>
+
+<div
+class="error"
+id="loginError"
+></div>
+
+<button
+class="primary"
+onclick="adminLogin()"
+>
+Login
+</button>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- ADMIN MODAL -->
+
+<div
+class="modal"
+id="adminModal"
+onclick="outsideClose(event,'adminModal')"
+>
+
+<div class="modalbox">
+
+<div class="modalhead">
+
+<div>
+
+<div class="eyebrow">
+Control Panel
+</div>
+
+<h2 style="margin:5px 0">
+Admin
+</h2>
+
+<div
+class="small"
+id="adminIdentity"
+></div>
+
+</div>
+
+<button
+class="close"
+onclick="closeAdmin()"
+>
+×
+</button>
+
+</div>
+
+<div class="modalbody">
+
+<div
+class="admin-tabs"
+id="adminTabs"
+>
+
+<button
+class="admin-tab active"
+onclick="switchAdminTab('general',this)"
+>
+General
+</button>
+
+<button
+class="admin-tab"
+onclick="switchAdminTab('basic',this)"
+>
+🟢 Basic
+</button>
+
+<button
+class="admin-tab"
+onclick="switchAdminTab('advanced',this)"
+>
+🔵 Advanced
+</button>
+
+<button
+class="admin-tab"
+onclick="switchAdminTab('full',this)"
+>
+👑 Full
+</button>
+
+</div>
+
+<section
+class="admin-section active"
+id="admin-general"
+></section>
+
+<section
+class="admin-section"
+id="admin-basic"
+></section>
+
+<section
+class="admin-section"
+id="admin-advanced"
+></section>
+
+<section
+class="admin-section"
+id="admin-full"
+></section>
+
+<section
+class="admin-section"
+id="admin-team"
+></section>
+
+</div>
+
+</div>
+</div>
+
+
+<div
+class="toast"
+id="toast"
+></div>
+
+
+<script>
+
+/* ==========================================
+   SUPABASE
+   ========================================== */
+
+const SUPABASE_URL=
+"https://xfpcsqtiferkjnrhqiad.supabase.co";
+
+const SUPABASE_KEY=
+"sb_publishable_Bo405Z3J6R6cDpAbhuc8BA_aJNX1CoH";
+
+const supabaseClient=
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+
+/* ==========================================
+   DEFAULT PACKAGES
+   ========================================== */
+
+const defaults={
+
+basic:{
+slug:"basic",
+name:"BASIC",
+icon:"🟢",
+price:"10M",
+short_description:
+"Clean server setup, channels, roles and basic bot configuration.",
+long_description:
+"A solid starting package for a clean and organized Discord server.",
+features:[
+"Server structure",
+"Channels and categories",
+"Basic roles and permissions",
+"Basic formatting",
+"Basic bot setup"
+],
+systems:[
+"Basic moderation",
+"Utility bots",
+"Permission setup"
+],
+process:[
+"Requirement check",
+"Setup",
+"Testing",
+"Handover"
+],
+notes:[
+"10M Blox Fruits value",
+"Exact fruits are negotiable",
+"Create a ticket to order",
+"Custom requirements can be discussed"
+],
+vouches:[]
+},
+
+advanced:{
+slug:"advanced",
+name:"ADVANCED",
+icon:"🔵",
+price:"25M",
+short_description:
+"Professional rework, advanced permissions, tickets and applications.",
+long_description:
+"A complete professional rework for communities that need more systems and structure.",
+features:[
+"Everything in Basic",
+"Professional layout",
+"Advanced roles and permissions",
+"Multiple bot systems",
+"Ticket system",
+"Staff applications",
+"Full server rework"
+],
+systems:[
+"Advanced moderation",
+"Tickets",
+"Staff applications",
+"Role architecture",
+"Utility automation"
+],
+process:[
+"Requirement discussion",
+"Server review",
+"Rework",
+"Testing",
+"Handover"
+],
+notes:[
+"25M Blox Fruits value",
+"Exact fruits are negotiable",
+"Create a ticket to order",
+"Custom requirements can be discussed"
+],
+vouches:[]
+},
+
+full:{
+slug:"full",
+name:"FULL",
+icon:"👑",
+price:"50M+",
+short_description:
+"Fully custom server systems, automation, webhooks and priority service.",
+long_description:
+"A full custom build for communities that need advanced systems and special requirements.",
+features:[
+"Everything in Advanced",
+"Fully custom structure/design",
+"Advanced automation",
+"Custom systems",
+"Custom webhooks/embeds",
+"Advanced staff architecture",
+"Special requirements",
+"Priority service"
+],
+systems:[
+"Custom automation",
+"Advanced tickets",
+"Webhooks",
+"Embeds",
+"Staff hierarchy",
+"Custom workflows"
+],
+process:[
+"Detailed discussion",
+"Planning",
+"Development",
+"Testing",
+"Deployment",
+"Priority handover"
+],
+notes:[
+"50M+ Blox Fruits value",
+"Exact fruits are negotiable",
+"Create a ticket to order",
+"Custom requirements can be discussed"
+],
+vouches:[]
+}
+
+};
+
+let packages=
+JSON.parse(JSON.stringify(defaults));
+
+
+/* ==========================================
+   WEBSITE SETTINGS
+   ========================================== */
+
+let siteSettings={
+
+discord_invite:
+"https://discord.gg/EPzK4n74e8",
+
+youtube:"#",
+instagram:"#",
+tiktok:"#",
+
+announcement:
+"Professional Discord server setup, reworks and custom systems.",
+
+service_status:"OPEN",
+
+projects:"0+",
+clients:"0+",
+systems:"0+",
+rating:"—"
+
+};
+
+let currentAdmin=null;
+
+
+/* ==========================================
+   HELPERS
+   ========================================== */
+
+const $=
+id=>document.getElementById(id);
+
+function esc(v=""){
+
+return String(v).replace(
+/[&<>"']/g,
+m=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#039;"
+}[m])
+);
+
+}
+
+function arr(v){
+return Array.isArray(v)?v:[];
+}
+
+function listHTML(a){
+
+return arr(a)
+.map(x=>`<li>${esc(x)}</li>`)
+.join("");
+
+}
+
+function showToast(msg){
+
+$("toast").textContent=msg;
+
+$("toast").style.display="block";
+
+clearTimeout(window.toastTimer);
+
+window.toastTimer=
+setTimeout(
+()=>$("toast").style.display="none",
+2500
+);
+
+}
+
+function openModal(id){
+$(id).classList.add("open");
+}
+
+function closeModal(id){
+$(id).classList.remove("open");
+}
+
+function outsideClose(e,id){
+
+if(e.target.id===id){
+closeModal(id);
+}
+
+}
+
+
+/* ==========================================
+   PACKAGE RENDER
+   ========================================== */
+
+function renderPackages(){
+
+$("packageGrid").innerHTML=
+
+Object.values(packages)
+.map(p=>{
+
+const isPopular=
+p.slug==="advanced";
+
+return`
+
+<div
+class="card package clickable ${isPopular?"popular":""}"
+onclick="openPackage('${p.slug}')"
+>
+
+${
+isPopular
+?
+`
+<div class="popularBadge">
+<span class="dot"></span>
+POPULAR
+</div>
+`
+:""
+}
+
+<div style="font-size:28px">
+${esc(p.icon)}
+</div>
+
+<h3>
+${esc(p.name)}
+</h3>
+
+${
+isPopular
+?
+`<div class="proLabel">PRO PACKAGE</div>`
+:""
+}
+
+<div class="price">
+${esc(p.price)}
+</div>
+
+<p class="muted">
+${esc(p.short_description)}
+</p>
+
+<div class="feature">
+<b>✓</b>
+View full package details
+</div>
+
+</div>
+
+`;
+
+})
+.join("");
+
+}
+
+
+/* ==========================================
+   OPEN PACKAGE
+   ========================================== */
+
+function openPackage(slug){
+
+const p=packages[slug];
+
+if(!p)return;
+
+$("detailEyebrow").textContent=
+`${p.icon} ${p.price}`;
+
+$("detailTitle").textContent=
+p.name;
+
+$("detailBody").innerHTML=`
+
+<p class="muted">
+${esc(p.long_description)}
+</p>
+
+<div class="detailgrid">
+
+<div>
+<h3>Included</h3>
+<ul class="list">
+${listHTML(p.features)}
+</ul>
+</div>
+
+<div>
+<h3>Systems</h3>
+<ul class="list">
+${listHTML(p.systems)}
+</ul>
+</div>
+
+<div>
+<h3>Process</h3>
+<ul class="list">
+${listHTML(p.process)}
+</ul>
+</div>
+
+<div>
+<h3>Notes</h3>
+<ul class="list">
+${listHTML(p.notes)}
+</ul>
+</div>
+
+</div>
+
+<div style="margin-top:18px">
+
+<h3>Vouches</h3>
+
+${
+p.vouches.length
+
+?
+
+p.vouches
+.map(v=>
+`<div class="preview">${esc(v)}</div>`
+)
+.join("")
+
+:
+
+'<div class="preview">No vouches added yet. Genuine feedback will appear here.</div>'
+}
+
+</div>
+
+<button
+class="primary"
+style="margin-top:20px"
+onclick="closeModal('packageModal');openOrder()"
+>
+Order ${esc(p.name)}
+</button>
+
+`;
+
+openModal("packageModal");
+
+}
+
+
+/* ==========================================
+   ORDER
+   ========================================== */
+
+function openOrder(){
+
+$("orderLink").href=
+siteSettings.discord_invite;
+
+openModal("orderModal");
+
+}
+
+
+/* ==========================================
+   APPLY SETTINGS
+   ========================================== */
+
+function applySettings(){
+
+$("announcement").textContent=
+siteSettings.announcement;
+
+$("serviceStatus").textContent=
+siteSettings.service_status;
+
+$("projects").textContent=
+siteSettings.projects;
+
+$("clients").textContent=
+siteSettings.clients;
+
+$("systems").textContent=
+siteSettings.systems;
+
+$("rating").textContent=
+siteSettings.rating;
+
+$("orderLink").href=
+siteSettings.discord_invite;
+
+$("year").textContent=
+new Date().getFullYear();
+
+}
+
+
+/* ==========================================
+   LOAD PUBLIC
+   ========================================== */
+
+async function loadPublic(){
+
+try{
+
+const s=
+await supabaseClient
+.from("site_settings")
+.select("*")
+.eq("id",1)
+.maybeSingle();
+
+if(s.data){
+
+siteSettings={
+...siteSettings,
+...s.data
+};
+
+}
+
+const p=
+await supabaseClient
+.from("package_details")
+.select("*");
+
+if(p.data&&p.data.length){
+
+p.data.forEach(x=>{
+
+packages[x.slug]={
+...packages[x.slug],
+...x
+};
+
+});
+
+}
+
+}catch(e){
+
+console.warn(e);
+
+}
+
+applySettings();
+renderPackages();
+
+}
+
+
+/* ==========================================
+   LOGIN
+   ========================================== */
+
+function openLogin(){
+openModal("loginModal");
+}
+
+
+async function adminLogin(){
+
+const email=
+$("loginEmail").value.trim();
+
+const password=
+$("loginPassword").value;
+
+const errorBox=
+$("loginError");
+
+errorBox.style.display="none";
+
+
+if(!email||!password){
+
+errorBox.textContent=
+"Enter your email and password.";
+
+errorBox.style.display="block";
+
+return;
+
+}
+
+
+try{
+
+const {
+data,
+error
+}=
+await supabaseClient.auth
+.signInWithPassword({
+email,
+password
+});
+
+if(error)throw error;
+
+
+const r=
+await supabaseClient
+.from("admins")
+.select("user_id,role")
+.eq("user_id",data.user.id)
+.maybeSingle();
+
+
+if(r.error)throw r.error;
+
+
+if(!r.data){
+
+await supabaseClient.auth.signOut();
+
+throw new Error(
+"This account is authenticated but is not registered as an admin."
+);
+
+}
+
+
+currentAdmin=r.data;
+
+closeModal("loginModal");
+
+await openAdminPanel();
+
+showToast(
+"Admin login successful."
+);
+
+}catch(e){
+
+errorBox.textContent=
+e.message||"Login failed.";
+
+errorBox.style.display="block";
+
+}
+
+}
+
+
+/* ==========================================
+   ADMIN
+   ========================================== */
+
+async function closeAdmin(){
+
+await supabaseClient.auth.signOut();
+
+currentAdmin=null;
+
+closeModal("adminModal");
+
+}
+
+
+function switchAdminTab(name,btn){
+
+document
+.querySelectorAll(".admin-tab")
+.forEach(x=>
+x.classList.remove("active")
+);
+
+document
+.querySelectorAll(".admin-section")
+.forEach(x=>
+x.classList.remove("active")
+);
+
+if(btn){
+btn.classList.add("active");
+}
+
+$("admin-"+name)
+.classList.add("active");
+
+if(name==="team"){
+loadTeam();
+}
+
+}
+
+
+function ensureTeamTab(){
+
+if(currentAdmin?.role!=="owner")return;
+
+if(!$("teamTab")){
+
+const b=
+document.createElement("button");
+
+b.id="teamTab";
+b.className="admin-tab";
+b.textContent="Admin Team";
+
+b.onclick=()=>
+switchAdminTab("team",b);
+
+$("adminTabs").appendChild(b);
+
+}
+
+}
+
+
+/* ==========================================
+   GENERAL EDITOR
+   ========================================== */
+
+function fillGeneralEditor(){
+
+$("admin-general").innerHTML=`
+
+<div class="editor-card">
+
+<h4>
+General Website
+</h4>
+
+<div class="form">
+
+<div class="row">
+
+<div>
+<label>Discord Invite</label>
+
+<input
+id="e_invite"
+value="${esc(siteSettings.discord_invite)}"
+>
+
+</div>
+
+<div>
+<label>Service Status</label>
+
+<input
+id="e_status"
+value="${esc(siteSettings.service_status)}"
+>
+
+</div>
+
+</div>
+
+
+<label>Announcement</label>
+
+<textarea id="e_announcement">${esc(siteSettings.announcement)}</textarea>
+
+
+<div class="row">
+
+<div>
+<label>Projects</label>
+
+<input
+id="e_projects"
+value="${esc(siteSettings.projects)}"
+>
+
+</div>
+
+<div>
+<label>Clients</label>
+
+<input
+id="e_clients"
+value="${esc(siteSettings.clients)}"
+>
+
+</div>
+
+</div>
+
+
+<div class="row">
+
+<div>
+<label>Systems</label>
+
+<input
+id="e_systems"
+value="${esc(siteSettings.systems)}"
+>
+
+</div>
+
+<div>
+<label>Rating</label>
+
+<input
+id="e_rating"
+value="${esc(siteSettings.rating)}"
+>
+
+</div>
+
+</div>
+
+
+<label>YouTube</label>
+
+<input
+id="e_youtube"
+value="${esc(siteSettings.youtube)}"
+>
+
+
+<label>Instagram</label>
+
+<input
+id="e_instagram"
+value="${esc(siteSettings.instagram)}"
+>
+
+
+<label>TikTok</label>
+
+<input
+id="e_tiktok"
+value="${esc(siteSettings.tiktok)}"
+>
+
+
+<button
+class="primary"
+onclick="saveEverything()"
+>
+Save Website
+</button>
+
+</div>
+
+</div>
+
+
+<div class="editor-card">
+
+<h4>
+Current account
+</h4>
+
+<div class="small">
+Role: ${esc(currentAdmin?.role||"admin")}
+</div>
+
+<div class="preview">
+${esc(currentAdmin?.user_id||"")}
+</div>
+
+<button
+class="secondary"
+onclick="copyMyId()"
+>
+Copy User ID
+</button>
+
+<button
+class="danger"
+style="float:right"
+onclick="closeAdmin()"
+>
+Logout
+</button>
+
+</div>
+
+`;
+
+}
+
+
+/* ==========================================
+   PACKAGE EDITOR
+   ========================================== */
+
+function renderPackageEditor(slug){
+
+const p=packages[slug];
+
+const id="admin-"+slug;
+
+$(id).innerHTML=`
+
+<div class="editor-card">
+
+<h4>
+${esc(p.icon)} ${esc(p.name)}
+</h4>
+
+<div class="form">
+
+<div class="row">
+
+<div>
+
+<label>Name</label>
+
+<input
+id="${slug}_name"
+value="${esc(p.name)}"
+>
+
+</div>
+
+<div>
+
+<label>Price</label>
+
+<input
+id="${slug}_price"
+value="${esc(p.price)}"
+>
+
+</div>
+
+</div>
+
+
+<label>Icon</label>
+
+<input
+id="${slug}_icon"
+value="${esc(p.icon)}"
+>
+
+
+<label>Short description</label>
+
+<textarea id="${slug}_short">${esc(p.short_description)}</textarea>
+
+
+<label>Full description</label>
+
+<textarea id="${slug}_long">${esc(p.long_description)}</textarea>
+
+
+<label>
+Features — one per line
+</label>
+
+<textarea id="${slug}_features">${arr(p.features).join("\n")}</textarea>
+
+
+<label>
+Systems — one per line
+</label>
+
+<textarea id="${slug}_systems">${arr(p.systems).join("\n")}</textarea>
+
+
+<label>
+Process — one per line
+</label>
+
+<textarea id="${slug}_process">${arr(p.process).join("\n")}</textarea>
+
+
+<label>
+Notes — one per line
+</label>
+
+<textarea id="${slug}_notes">${arr(p.notes).join("\n")}</textarea>
+
+
+<label>
+Vouches — one per line
+</label>
+
+<textarea id="${slug}_vouches">${arr(p.vouches).join("\n")}</textarea>
+
+
+<div class="preview">
+
+<b>Live preview:</b>
+
+${esc(p.price)}
+—
+${esc(p.short_description)}
+
+</div>
+
+
+<button
+class="primary"
+onclick="saveEverything()"
+>
+Save All Changes
+</button>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+/* ==========================================
+   READ PACKAGE
+   ========================================== */
+
+function readPackage(slug){
+
+const p=packages[slug];
+
+const val=
+id=>$(id).value;
+
+const lines=
+id=>
+val(id)
+.split("\n")
+.map(x=>x.trim())
+.filter(Boolean);
+
+
+return{
+
+...p,
+
+name:
+val(slug+"_name").trim(),
+
+price:
+val(slug+"_price").trim(),
+
+icon:
+val(slug+"_icon").trim(),
+
+short_description:
+val(slug+"_short").trim(),
+
+long_description:
+val(slug+"_long").trim(),
+
+features:
+lines(slug+"_features"),
+
+systems:
+lines(slug+"_systems"),
+
+process:
+lines(slug+"_process"),
+
+notes:
+lines(slug+"_notes"),
+
+vouches:
+lines(slug+"_vouches")
+
+};
+
+}
+
+
+/* ==========================================
+   SAVE
+   ========================================== */
+
+async function saveEverything(){
+
+try{
+
+siteSettings={
+...siteSettings,
+
+discord_invite:
+$("e_invite").value.trim(),
+
+service_status:
+$("e_status").value.trim(),
+
+announcement:
+$("e_announcement").value.trim(),
+
+projects:
+$("e_projects").value.trim(),
+
+clients:
+$("e_clients").value.trim(),
+
+systems:
+$("e_systems").value.trim(),
+
+rating:
+$("e_rating").value.trim(),
+
+youtube:
+$("e_youtube").value.trim(),
+
+instagram:
+$("e_instagram").value.trim(),
+
+tiktok:
+$("e_tiktok").value.trim()
+
+};
+
+
+const s=
+await supabaseClient
+.from("site_settings")
+.update({
+...siteSettings,
+updated_at:new Date().toISOString()
+})
+.eq("id",1);
+
+
+if(s.error)throw s.error;
+
+
+for(
+const slug of
+["basic","advanced","full"]
+){
+
+const p=
+readPackage(slug);
+
+packages[slug]=p;
+
+
+const r=
+await supabaseClient
+.from("package_details")
+.upsert(
+p,
+{onConflict:"slug"}
+);
+
+if(r.error)throw r.error;
+
+}
+
+
+applySettings();
+
+renderPackages();
+
+fillGeneralEditor();
+
+[
+"basic",
+"advanced",
+"full"
+].forEach(renderPackageEditor);
+
+
+showToast(
+"All changes saved."
+);
+
+
+}catch(e){
+
+console.error(e);
+
+showToast(
+"Save failed: "+
+(e.message||"Unknown error")
+);
+
+}
+
+}
+
+
+/* ==========================================
+   OPEN ADMIN PANEL
+   ========================================== */
+
+async function openAdminPanel(){
+
+if(!currentAdmin)return;
+
+ensureTeamTab();
+
+fillGeneralEditor();
+
+[
+"basic",
+"advanced",
+"full"
+].forEach(renderPackageEditor);
+
+
+switchAdminTab(
+"general",
+document.querySelector(".admin-tab")
+);
+
+
+$("adminIdentity").textContent=
+`${currentAdmin.role.toUpperCase()} • ${currentAdmin.user_id}`;
+
+
+openModal("adminModal");
+
+}
+
+
+/* ==========================================
+   ADMIN TEAM
+   ========================================== */
+
+async function loadTeam(){
+
+const box=
+$("admin-team");
+
+
+if(currentAdmin?.role!=="owner"){
+
+box.innerHTML="";
+
+return;
+
+}
+
+
+box.innerHTML=`
+
+<div class="editor-card">
+
+<h4>
+Admin Management
+</h4>
+
+<p class="small">
+Owner only. Add another Supabase Auth user's UUID as an admin.
+The owner cannot be removed.
+</p>
+
+<div class="form">
+
+<label>User UUID</label>
+
+<input
+id="newAdminId"
+placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+>
+
+<button
+class="primary"
+onclick="addAdmin()"
+>
+Add Admin
+</button>
+
+</div>
+
+</div>
+
+
+<div class="editor-card">
+
+<h4>
+Current Admins
+</h4>
+
+<div
+id="adminList"
+class="admin-list"
+>
+Loading...
+</div>
+
+</div>
+
+`;
+
+
+const r=
+await supabaseClient
+.from("admins")
+.select("user_id,role")
+.order("role",{ascending:true});
+
+
+if(r.error){
+
+$("adminList").textContent=
+r.error.message;
+
+return;
+
+}
+
+
+$("adminList").innerHTML=
+
+r.data
+.map(a=>`
+
+<div class="admin-item">
+
+<div>
+
+<div>
+${esc(a.user_id)}
+</div>
+
+<span class="role">
+${esc(a.role)}
+</span>
+
+</div>
+
+${
+a.role==="owner"
+
+?
+
+'<span class="small">Owner protected</span>'
+
+:
+
+`<button
+class="danger"
+onclick="removeAdmin('${a.user_id}')"
+>
+Remove
+</button>`
+}
+
+</div>
+
+`)
+.join("");
+
+}
+
+
+/* ==========================================
+   ADD ADMIN
+   ========================================== */
+
+async function addAdmin(){
+
+const id=
+$("newAdminId").value.trim();
+
+
+if(
+!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(id)
+){
+
+showToast(
+"Enter a valid Supabase user UUID."
+);
+
+return;
+
+}
+
+
+const r=
+await supabaseClient
+.from("admins")
+.insert({
+user_id:id,
+role:"admin"
+});
+
+
+if(r.error){
+
+showToast(r.error.message);
+
+return;
+
+}
+
+
+$("newAdminId").value="";
+
+await loadTeam();
+
+showToast(
+"Admin added."
+);
+
+}
+
+
+/* ==========================================
+   REMOVE ADMIN
+   ========================================== */
+
+async function removeAdmin(id){
+
+if(
+!confirm("Remove this admin?")
+)return;
+
+
+const r=
+await supabaseClient
+.from("admins")
+.delete()
+.eq("user_id",id);
+
+
+if(r.error){
+
+showToast(r.error.message);
+
+return;
+
+}
+
+
+await loadTeam();
+
+showToast(
+"Admin removed."
+);
+
+}
+
+
+/* ==========================================
+   COPY ID
+   ========================================== */
+
+async function copyMyId(){
+
+try{
+
+await navigator.clipboard.writeText(
+currentAdmin.user_id
+);
+
+showToast(
+"User ID copied."
+);
+
+}catch{
+
+showToast(
+currentAdmin.user_id
+);
+
+}
+
+}
+
+
+/* ==========================================
+   LOGIN ENTER
+   ========================================== */
+
+$("loginPassword")
+.addEventListener(
+"keydown",
+e=>{
+
+if(e.key==="Enter"){
+adminLogin();
+}
+
+}
+);
+
+
+/* ==========================================
+   LIGHTWEIGHT PARTICLES
+   ========================================== */
+
+const particleCount=12;
+
+for(
+let i=0;
+i<particleCount;
+i++
+){
+
+const particle=
+document.createElement("div");
+
+particle.className="particle";
+
+particle.style.left=
+Math.random()*100+"vw";
+
+particle.style.animationDuration=
+(12+Math.random()*12)+"s";
+
+particle.style.animationDelay=
+(-Math.random()*20)+"s";
+
+particle.style.width=
+(1+Math.random()*2)+"px";
+
+particle.style.height=
+particle.style.width;
+
+document.body.appendChild(
+particle
+);
+
+}
+
+
+/* ==========================================
+   LOAD
+   ========================================== */
+
+loadPublic();
+
+
+/* ==========================================
+   RESTORE SESSION
+   ========================================== */
+
+supabaseClient.auth
+.getSession()
+.then(async({data})=>{
+
+if(!data.session)return;
+
+
+const r=
+await supabaseClient
+.from("admins")
+.select("user_id,role")
+.eq(
+"user_id",
+data.session.user.id
+)
+.maybeSingle();
+
+
+if(r.data){
+
+currentAdmin=r.data;
+
+}
+
+});
+
+</script>
+
+</body>
+</html>
